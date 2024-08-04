@@ -1,42 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: coworking
-  labels:
-    name: coworking
+  name: postgresql
 spec:
-  replicas: 1
   selector:
     matchLabels:
-      service: coworking
+      app: postgresql
   template:
     metadata:
       labels:
-        service: coworking
+        app: postgresql
     spec:
       containers:
-        - name: coworking
-          image: 558011892070.dkr.ecr.us-east-1.amazonaws.com/558011892070:0.0.1
-          imagePullPolicy: IfNotPresent
-          livenessProbe:
-            httpGet:
-              path: /health_check
-              port: 5153
-            initialDelaySeconds: 5
-            timeoutSeconds: 2
-          readinessProbe:
-            httpGet:
-              path: "/readiness_check"
-              port: 5153
-            initialDelaySeconds: 5
-            timeoutSeconds: 5
-          envFrom:
-            - configMapRef:
-                name: db-env
+        - name: postgresql
+          image: 339712711573.dkr.ecr.us-east-1.amazonaws.com/339712711573:DB.0.0.1
           env:
-            - name: DB_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: db-secret
-                  key: d293aW1zb3NlY3VyZQ
-      restartPolicy: Always
+            - name: POSTGRES_DB
+              value: postgres
+            - name: POSTGRES_USER
+              value: admin
+            - name: POSTGRES_PASSWORD
+              value: d293aW1zb3NlY3VyZQ
+          ports:
+            - containerPort: 5432
+          volumeMounts:
+            - mountPath: /var/lib/postgresql/data
+              name: postgresql-storage
+      volumes:
+        - name: postgresql-storage
+          persistentVolumeClaim:
+            claimName: postgresql-pvc
