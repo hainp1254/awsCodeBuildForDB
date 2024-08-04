@@ -1,4 +1,8 @@
+FROM python:3.10-slim-buster
+
 # Install Postgres and configure a username + password
+USER root
+
 ARG POSTGRES_USER=$POSTGRES_USER
 ARG POSTGRES_PASSWORD=$POSTGRES_PASSWORD
 
